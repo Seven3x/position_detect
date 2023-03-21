@@ -1,8 +1,9 @@
 import serial
 import struct
 
-# Create a serial object with the port name and baud rate
-ser = serial.Serial('COM3', 9600)
+def ser_init(com = 'COM3', baudrate = 115200, timeout = 0):
+    # Create a serial object with the port name and baud rate
+    ser = serial.Serial('COM3', 9600, timeout= 0)
 
 # Define a function that takes a 3D coordinate as an argument and sends it to the serial port
 def send_3d_coordinate(coord):
