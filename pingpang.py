@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import rspoint
 
 # Define a function that takes an image as an argument and returns a list of ping pong balls' pixel coordinates and sizes
 def detect_ping_pong_balls(image):
@@ -39,3 +40,28 @@ def detect_ping_pong_balls(image):
     
     # Return the balls list
     return balls
+
+
+if __name__ == '__main__':
+    pipeline, profile, align = rspoint.init_d455()
+    
+    while True:
+        depth_frame, color_frame, depth_intrinsics, color_intrinsics = rspoint.get_frame(pipeline, align)
+        
+        if depth_frame is None or depth_frame is None:
+            continue
+        # Convert images to numpy arrays
+        color_image = np.asanyarray(color_frame.get_data())
+        
+        balls = detect_ping_pong_balls(color_image)
+        
+        print(len(balls))
+        
+        if len(balls) != 0:
+            (x,y,r) = balls[0]
+            color_image = cv2.rectangle(color_image, (x-r,y-r), (x+r,y+r), (0,255,0), 2)
+            
+        cv2.imshow('color', color_image)
+        # quit when press q
+        if cv2.waitKey (1) & 0xFF == ord ('q'): 
+            break
