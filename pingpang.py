@@ -51,15 +51,16 @@ def detect_color(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.
 
 
 
-# Define a function that takes an image as an argument and returns a list of ping pong balls' pixel coordinates and sizes
-def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.array([15, 255, 255]), debug = False):
+def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.array([15, 255, 255]), houghparam1 = 100, houghparam2=45,debug = False):
     """
-    Detects ping pong balls in an image and returns their pixel coordinates and sizes.
+    Detects ping pong balls in an image and returns a list of ping pong balls' pixel coordinates and sizes
     
     Args:
         image: A numpy array representing the image to be processed.
         lower_limit: A numpy array representing the lower limit of the orange color range in HSV color space.
         upper_limit: A numpy array representing the upper limit of the orange color range in HSV color space.
+        houghparam1: First method-specific parameter of the HoughCircles method.
+        houghparam2: Second method-specific parameter of the HoughCircles method.
         debug: A boolean value indicating whether to show debug information.
         
     Returns:
@@ -83,7 +84,7 @@ def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np
     
     # Hough detect
     circles = cv2.HoughCircles(r, cv2.HOUGH_GRADIENT, 1, 50,
-                         param1=100, param2=45, minRadius=0, maxRadius=10000)
+                         param1=houghparam1, param2=houghparam2, minRadius=0, maxRadius=10000)
     
     # regular output
     if circles is None:
@@ -98,6 +99,7 @@ def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np
         cv2.imshow('mask', r)   
         
     return circles
+
 
 
     

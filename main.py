@@ -4,6 +4,7 @@ import stm32
 import numpy as np
 import cv2
 
+# A boolean value indicating whether to show debug information.
 debug = False
 
 if __name__ == "__main__":
@@ -28,8 +29,14 @@ if __name__ == "__main__":
         depth_image = np.asanyarray(depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
         
-        # detect pingpang
-        balls = pingpang.detect_circle(color_image, debug= debug)
+        
+        # 2. upper_limit: the upper limit of the pingpang color in HSV
+        # 3. lower_limit: the lower limit of the pingpang color in HSV
+        # 4. houghparam1: the first threshold for the circle detection algorithm
+        # 5. houghparam2: the second threshold for the circle detection algorithm
+        # 6. debug: a boolean value indicating whether to print debug information
+        balls = pingpang.detect_circle(color_image, lower_limit, upper_limit, houghparam1= 100, houghparam2= 45, debug= debug)
+
 
         # make sure        
         if len(balls) != 0:
