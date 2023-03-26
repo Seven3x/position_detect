@@ -1,0 +1,4 @@
+pyrealsense2==2.50.0.3812
+numpy==1.22.3
+opencv-python==4.5.5.64
+pyserial==3.5

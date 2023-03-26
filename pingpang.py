@@ -3,16 +3,12 @@ import numpy as np
 import rspoint
 
 # Define a function that takes an image as an argument and returns a list of ping pong balls' pixel coordinates and sizes
-def detect_ping_pong_balls(image):
+def detect_color(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.array([15, 255, 255]), debug = False):
     # Convert the image to HSV color space
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
-    # Define the lower and upper boundaries of the orange color in HSV
-    lower_orange = np.array([5, 100, 100])
-    upper_orange = np.array([15, 255, 255])
-    
     # Create a mask for the orange color
-    mask = cv2.inRange(hsv, lower_orange, upper_orange)
+    mask = cv2.inRange(hsv, lower_limit, upper_limit)
     
     # Find the contours of the ping pong balls in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -42,6 +38,43 @@ def detect_ping_pong_balls(image):
     return balls
 
 
+def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.array([15, 255, 255]), debug = False):
+    # Convert the image to HSV color space
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    
+    b,g,r = cv2.split(image)
+    
+    
+    # kernel for dilate
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7,7))
+    
+    # Create a mask for the orange color
+    mask = cv2.inRange(hsv, lower_limit, upper_limit)
+    mask = cv2.dilate(mask, kernel, 10)
+    
+    # import color data
+    r = mask*r
+    
+    # Hough detect
+    circles = cv2.HoughCircles(r, cv2.HOUGH_GRADIENT, 1, 50,
+                         param1=100, param2=45, minRadius=0, maxRadius=10000)
+    
+    # regular output
+    if circles is None:
+        circles = []
+    else:
+        circles = circles[0]
+        if(debug):
+            print(circles)
+    
+    # show_image
+    if(debug):
+        cv2.imshow('mask', r)   
+        
+    return circles
+    
+    
+
 if __name__ == '__main__':
     pipeline, profile, align = rspoint.init_d455()
     
@@ -53,15 +86,17 @@ if __name__ == '__main__':
         # Convert images to numpy arrays
         color_image = np.asanyarray(color_frame.get_data())
         
-        balls = detect_ping_pong_balls(color_image)
+        balls = detect_circle(color_image)
         
-        print(len(balls))
+        # print(len(balls))
         
         if len(balls) != 0:
             (x,y,r) = balls[0]
-            color_image = cv2.rectangle(color_image, (x-r,y-r), (x+r,y+r), (0,255,0), 2)
+            color_image = cv2.rectangle(color_image, (int(x-r),int(y-r)), (int(x+r),int(y+r)), (0,255,0), 2)
             
+        b,g,r = cv2.split(color_image)
         cv2.imshow('color', color_image)
+        cv2.imshow('r', r)
         # quit when press q
         if cv2.waitKey (1) & 0xFF == ord ('q'): 
             break
