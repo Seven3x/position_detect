@@ -4,6 +4,18 @@ import rspoint
 
 # Define a function that takes an image as an argument and returns a list of ping pong balls' pixel coordinates and sizes
 def detect_color(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.array([15, 255, 255]), debug = False):
+    """
+    Detects ping pong balls in an image and returns their pixel coordinates and sizes.
+    
+    Args:
+        image: A numpy array representing the image to be processed.
+        lower_limit: A numpy array representing the lower limit of the orange color range in HSV color space.
+        upper_limit: A numpy array representing the upper limit of the orange color range in HSV color space.
+        debug: A boolean value indicating whether to show debug information.
+        
+    Returns:
+        A list of tuples representing the (x, y) coordinates and radius size of the detected ping pong balls.
+    """
     # Convert the image to HSV color space
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
@@ -38,7 +50,21 @@ def detect_color(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.
     return balls
 
 
+
+# Define a function that takes an image as an argument and returns a list of ping pong balls' pixel coordinates and sizes
 def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np.array([15, 255, 255]), debug = False):
+    """
+    Detects ping pong balls in an image and returns their pixel coordinates and sizes.
+    
+    Args:
+        image: A numpy array representing the image to be processed.
+        lower_limit: A numpy array representing the lower limit of the orange color range in HSV color space.
+        upper_limit: A numpy array representing the upper limit of the orange color range in HSV color space.
+        debug: A boolean value indicating whether to show debug information.
+        
+    Returns:
+        A list of tuples representing the (x, y) coordinates and radius size of the detected ping pong balls.
+    """
     # Convert the image to HSV color space
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
@@ -72,31 +98,41 @@ def detect_circle(image, lower_limit = np.array([5, 100, 100]), upper_limit = np
         cv2.imshow('mask', r)   
         
     return circles
+
+
     
     
 
 if __name__ == '__main__':
+    # initialize the pipeline, profile, and align
     pipeline, profile, align = rspoint.init_d455()
     
     while True:
+        # get the depth frame, color frame, depth intrinsics, and color intrinsics
         depth_frame, color_frame, depth_intrinsics, color_intrinsics = rspoint.get_frame(pipeline, align)
         
+        # if either the depth frame or color frame is None, continue to the next iteration
         if depth_frame is None or depth_frame is None:
             continue
-        # Convert images to numpy arrays
+        
+        # Convert the color frame to a numpy array
         color_image = np.asanyarray(color_frame.get_data())
         
+        # detect the ping pong balls in the color image
         balls = detect_circle(color_image)
         
-        # print(len(balls))
-        
+        # if there are any ping pong balls detected, draw a rectangle around the first one
         if len(balls) != 0:
             (x,y,r) = balls[0]
             color_image = cv2.rectangle(color_image, (int(x-r),int(y-r)), (int(x+r),int(y+r)), (0,255,0), 2)
             
+        # split the color image into its RGB channels
         b,g,r = cv2.split(color_image)
+        
+        # show the color image and the red channel
         cv2.imshow('color', color_image)
         cv2.imshow('r', r)
-        # quit when press q
+        
+        # quit the program when the 'q' key is pressed
         if cv2.waitKey (1) & 0xFF == ord ('q'): 
             break
