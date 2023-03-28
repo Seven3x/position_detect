@@ -6,17 +6,22 @@ import cv2
 
 # A boolean value indicating whether to show debug information.
 debug = False
+# Define the lower and upper boundaries of the pingpang color in HSV
+houghparam1=100  # first threshold for the circle detection algorithm
+houghparam2=45  # second threshold for the circle detection algorithm
+lower_limit = np.array([5, 100, 100])  # lower limit of the pingpang color in HSV
+upper_limit = np.array([15, 255, 255])  # upper limit of the pingpang color in HSV
+# serial port
+serial_port = 'COM7'  
+
+
 
 if __name__ == "__main__":
     # initialize d455 camera and get camera information
     pipeline, profile, align = rspoint.init_d455()
     
     # create and initialize serial communication
-    ser = stm32.ser_init('COM7')
-    
-    # Define the lower and upper boundaries of the pingpang color in HSV
-    lower_limit = np.array([5, 100, 100])
-    upper_limit = np.array([15, 255, 255])
+    ser = stm32.ser_init(serial_port)
     
     # start to loop
     while True:
@@ -35,7 +40,7 @@ if __name__ == "__main__":
         # 4. houghparam1: the first threshold for the circle detection algorithm
         # 5. houghparam2: the second threshold for the circle detection algorithm
         # 6. debug: a boolean value indicating whether to print debug information
-        balls = pingpang.detect_circle(color_image, lower_limit, upper_limit, houghparam1= 100, houghparam2= 45, debug= debug)
+        balls = pingpang.detect_circle(color_image, lower_limit, upper_limit, houghparam1, houghparam2, debug= debug)
 
 
         # make sure        
